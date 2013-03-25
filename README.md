@@ -29,6 +29,20 @@ So a few notes.  Dalli:
  4. provides proper failover with recovery and adjustable timeouts
 
 
+XCompatible Version
+---------------------
+
+The regular version of Dalli sets flags to identify whether a piece of data is a) marshalled and b) compressed. This causes a problem when this data is accessed by applications
+written in other languages (for e.g. PHP Memcached does not set a flag for serialized data. This library will croak if the serialized flag is set). This can be easily verified using 
+telnet - ``` set 0 0 33 \r\n hello world\r\n``` is what is read correctly by PHP, however ```set 1 0 33 \r\n hello world \r\n ``` is not read correctly by PHP.
+
+To fix this, I have removed the setting of flags by Dalli and I instead fall to the user set configuration flags to determine compression and marshalling.
+
+For example, my Rails configuration looks like 
+```
+config.cache_store = :dalli_store, '127.0.0.1',{ :expires_in => 1.day, :compress => false, :serializer => JSON }
+```
+
 Supported Ruby versions and implementations
 ------------------------------------------------
 

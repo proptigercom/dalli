@@ -411,14 +411,14 @@ module Dalli
       end
 
       flags = 0
-      flags |= FLAG_COMPRESSED if compressed
-      flags |= FLAG_SERIALIZED if marshalled
+      #flags |= FLAG_COMPRESSED if compressed
+      #flags |= FLAG_SERIALIZED if marshalled
       [value, flags]
     end
 
     def deserialize(value, flags)
-      value = self.compressor.decompress(value) if (flags & FLAG_COMPRESSED) != 0
-      value = self.serializer.load(value) if (flags & FLAG_SERIALIZED) != 0
+      value = self.compressor.decompress(value) if @options[:compress] == true
+      value = self.serializer.load(value) if  @options[:serializer] != 0
       value
     rescue TypeError
       raise if $!.message !~ /needs to have method `_load'|exception class\/object expected|instance of IO needed|incompatible marshal file format/
